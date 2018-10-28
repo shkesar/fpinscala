@@ -83,6 +83,9 @@ trait Foldable[F[_]] {
   def foldMap[A,B](as: F[A])(f: (A,B) => B)(mb: Monoid[B]): B
   def concatenate[A](as: F[A])(m: Monoid[A]): A =
     foldLeft(as)(m.zero)(m.op)
+  // Exercise 10.15
+  def toList(fa: F[A]): List[A] =
+    foldRight(fa)(List[A]())(_ :: _)
 }
 
 // Exercise 10.12
@@ -113,6 +116,10 @@ object StreamFoldable extends Foldable[Stream] {
   def foldMap[A,B](as: Stream[A])(f: (A,B) => B)(mb: Monoid[B]): B = ???
 }
 
+// Exercise 10.13
+// Todo - After learning Trees
+
+// Exercise 10.14
 object OptionFoldable extends Foldable[Option] {
   def foldRight[A,B](as: Option[A])(z: B)(f: (A,B) => B): B = as match {
     case None    => z
@@ -126,4 +133,10 @@ object OptionFoldable extends Foldable[Option] {
     case None    => mb.zero
     case Some(a) => f(a)
   }
+}
+
+// Exercise 10.16
+def productMonoid[A,B](A: Monoid[A], B: Monoid[B]): Monoid[A,B] = new Monoid {
+  override def zero = (A.zero, B.zero)
+  override def op(a: (A,B), b: (A,B)) = (A.op(a._1, b._1), B.op(a._2, b._2))
 }
