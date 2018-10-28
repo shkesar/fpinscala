@@ -74,3 +74,56 @@ def foldMapV[A,B](v: IndexedSeq[A], m: Monoid[B])(f: A => B): B = {
     m.op(foldMapV(l)(f), foldMapV(r)(f))
   }
 }
+
+
+
+trait Foldable[F[_]] {
+  def foldRight[A,B](as: F[A])(z: B)(f: (A,B) => B): B
+  def foldLeft[A,B](as: F[A])(z: B)(f: (B,A) => B): B
+  def foldMap[A,B](as: F[A])(f: (A,B) => B)(mb: Monoid[B]): B
+  def concatenate[A](as: F[A])(m: Monoid[A]): A =
+    foldLeft(as)(m.zero)(m.op)
+}
+
+// Exercise 10.12
+object ListFoldable extends Foldable[List] {
+  def foldRight[A,B](as: List[A])(z: B)(f: (A,B) => B): B =
+    as.foldRight(z)(f)
+  def foldLeft[A,B](as: List[A])(z: B)(f: (B,A) => B): B =
+    as.foldLeft(z)(f)
+  def foldMap[A,B](as: List[A])(f: (A,B) => B)(mb: Monoid[B]): B =
+    foldLeft(as)(m.zero)((b,a) => m.op(b, f(a)))
+}
+
+object IndexedSeqFoldable extends Foldable[IndexedSeq] {
+  def foldRight[A,B](as: IndexedSeq[A])(z: B)(f: (A,B) => B): B =
+    as.foldRight(z)(f)
+  def foldLeft[A,B](as: IndexedSeq[A])(z: B)(f: (B,A) => B): B =
+    as.foldLeft(z)(f)
+  def foldMap[A,B](as: IndexedSeq[A])(f: (A,B) => B)(mb: Monoid[B]): B =
+    foldMapV(as, m)(f)
+}
+
+object StreamFoldable extends Foldable[Stream] {
+  def foldRight[A,B](as: Stream[A])(z: B)(f: (A,B) => B): B =
+    as.foldRight(z)(f)
+  def foldLeft[A,B](as: Stream[A])(z: B)(f: (B,A) => B): B =
+    as.foldLeft(z)(f)
+  // Todo - After learning Streams
+  def foldMap[A,B](as: Stream[A])(f: (A,B) => B)(mb: Monoid[B]): B = ???
+}
+
+object OptionFoldable extends Foldable[Option] {
+  def foldRight[A,B](as: Option[A])(z: B)(f: (A,B) => B): B = as match {
+    case None    => z
+    case Some(a) => f(a, z)
+  }
+  def foldLeft[A,B](as: Option[A])(z: B)(f: (B,A) => B): B = as match {
+    case None    => z
+    case Some(a) => f(z, a)
+  }
+  def foldMap[A,B](as: Option[A])(f: (A,B) => B)(mb: Monoid[B]): B = as match {
+    case None    => mb.zero
+    case Some(a) => f(a)
+  }
+}
