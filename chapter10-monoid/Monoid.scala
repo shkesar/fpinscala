@@ -50,9 +50,6 @@ def endoMonoid[A] = Monoid[A => A] {
 // TODO 0 After Reading Part 2
 
 
-
-
-
 def concatenate[A](as: List[A], m: Monoid[A]): A =
   as.foldLeft(m.zero)(m.op)
 
@@ -65,3 +62,15 @@ def foldLeft[A,B](as: List[A])(z: B)(f: (A, B) => B): B =
   foldMap(as, endoMonoid[B])(f.curried)(z)
 
 def foldRight[A,B](as: List[A])(z: B)(f: A => B): B = ???
+
+// Exercise 10.7
+def foldMapV[A,B](v: IndexedSeq[A], m: Monoid[B])(f: A => B): B = {
+  if (v.length == 0) {
+    m.zero
+  } else if (v.length == 1) {
+    f(v(0))
+  } else {
+    var (l, r) = v.splitAt(v.length/2)
+    m.op(foldMapV(l)(f), foldMapV(r)(f))
+  }
+}
