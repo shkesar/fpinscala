@@ -39,3 +39,13 @@ def optionMonoid[A] = new Monoid[Option[A]] {
   def op(a1: Option[A], a2: Option[A]): OptionA = a1 orElse a2
   def zero: None
 }
+
+// Exercise 10.3
+def endoMonoid[A] = Monoid[A => A] {
+  def op(a1: A => A, a2: A => A) = a1 compose a2
+  def zero = (a: A) => a
+}
+
+// Exercise 10.4
+// TODO 0 After Reading Part 2
+
