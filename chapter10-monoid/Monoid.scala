@@ -49,3 +49,19 @@ def endoMonoid[A] = Monoid[A => A] {
 // Exercise 10.4
 // TODO 0 After Reading Part 2
 
+
+
+
+
+def concatenate[A](as: List[A], m: Monoid[A]): A =
+  as.foldLeft(m.zero)(m.op)
+
+// Exercise 10.5
+def foldMap[A,B](as: List[A], m: Monoid[A])(f: A => B): B =
+  as.foldLeft((b,a) => m.op(b, f(a)))
+
+// Exercise 10.6
+def foldLeft[A,B](as: List[A])(z: B)(f: (A, B) => B): B =
+  foldMap(as, endoMonoid[B])(f.curried)(z)
+
+def foldRight[A,B](as: List[A])(z: B)(f: A => B): B = ???
